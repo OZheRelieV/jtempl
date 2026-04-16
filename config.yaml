@@ -1,0 +1,49 @@
+sections:
+  - name: Содержание
+    type: markdown
+    heading_level: 1
+    is_toc: true
+    content:
+      - name: Импорты
+        type: markdown
+        heading_level: 1
+        is_imports: true
+        modules:
+          - module: pandas
+            alias: pd
+          - module: numpy
+            alias: np
+          - module: matplotlib.pyplot
+            alias: plt
+          - module: seaborn
+            alias: sns
+          - module: warnings
+          - module: tqdm.notebook
+            imports: [tqdm]
+          - module: gc
+          - module: sklearn.model_selection
+            imports: [train_test_split]
+          - module: catboost
+            alias: cb
+          - module: lightgbm
+            alias: lgb
+          - module: xgboost
+            alias: xgb
+      - name: Загрузка данных
+        type: markdown
+        heading_level: 1
+      - name: Разведочный анализ данных
+        type: markdown
+        heading_level: 1
+      - name: Предобработка данных
+        type: markdown
+        heading_level: 1
+      - name: Разделение данных
+        type: markdown
+        heading_level: 1
+      - name: Обучение и оценка модели
+        type: markdown
+        heading_level: 1
+      - name: Выводы
+        type: markdown
+        heading_level: 1
