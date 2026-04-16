@@ -1,11 +1,14 @@
-from nbformat.v4 import new_notebook, new_markdown_cell, new_code_cell
 from pathlib import Path
-import yaml
+
 import nbformat
+import yaml
+from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
+
 
 class NotebookTemplateBuilder:
     __slots__ = ("config_path", "output_path", "config", "nb")
-    def __init__(self,config_path: str | Path, output_path: str | Path):
+
+    def __init__(self, config_path: str | Path, output_path: str | Path):
         self.config_path = Path(config_path)
         self.output_path = Path(output_path)
         self.config = self._load_config()
@@ -18,26 +21,39 @@ class NotebookTemplateBuilder:
     def _validate(self) -> None:
         sections = self.config.get("sections", [])
         if not sections:
-            raise ValueError("Конфигурация не содержит раздел 'sections'.")
+            raise ValueError(
+                "Конфигурация не содержит раздел 'sections'."
+            )
         if len(sections) != 1:
-            raise ValueError("Ожидается ровно один корневой раздел 'sections'.")
+            raise ValueError(
+                "Ожидается ровно один корневой раздел 'sections'."
+            )
         if not sections[0].get("is_toc"):
-            raise ValueError("Корневой раздел в 'sections' должен быть оглавлением.")
+            raise ValueError(
+                "Первый раздел в 'sections' должен быть оглавлением."
+            )
         if not sections[0].get("content"):
-            raise ValueError("Раздел оглавления должен содержать 'content'.")
+            raise ValueError(
+                "Раздел оглавления должен содержать 'content'."
+            )
 
     def _build_toc(self) -> str:
         toc = self.config["sections"][0]
         level = toc.get("heading_level", 1)
         title = toc.get("name", "Содержание")
         lines = [f"{'#' * level} {title}"]
-        lines += [f"- [{item.get('name', 'Раздел')}](#id{i})" for i, item in enumerate(toc["content"])]
+        lines += [
+            f"- [{item.get('name', 'Раздел')}](#id{i})"
+            for i, item in enumerate(toc["content"])
+        ]
         return "\n".join(lines)
 
     def _build_imports(self, modules: list) -> str:
         if not modules:
-            raise ValueError("Раздел помечен как импорты, но список модулей пуст.")
-        
+            raise ValueError(
+                "Раздел помечен как импорты, но список модулей пуст."
+            )
+
         imports = []
         for mod in modules:
             name = mod.get("module", "unknown_module")
@@ -45,7 +61,9 @@ class NotebookTemplateBuilder:
             funcs = mod.get("imports", [])
 
             if alias and funcs:
-                raise NotImplementedError("Импорт функций с алиасом пока не поддерживается.")
+                raise NotImplementedError(
+                    "Импорт функций с алиасом пока не поддерживается."
+                )
             if alias:
                 imports.append(f"import {name} as {alias}")
             elif funcs:
@@ -65,7 +83,11 @@ class NotebookTemplateBuilder:
             self.nb.cells.append(new_markdown_cell(f"{'#' * level} {name}"))
 
             if section.get("is_imports"):
-                self.nb.cells.append(new_code_cell(self._build_imports(section.get("modules", []))))
+                self.nb.cells.append(
+                    new_code_cell(
+                        self._build_imports(section.get("modules", []))
+                    )
+                )
             else:
                 self.nb.cells.append(new_code_cell())
 
